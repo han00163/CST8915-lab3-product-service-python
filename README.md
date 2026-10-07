@@ -50,7 +50,7 @@ Compose starts only the API. The image uses the same locked runtime dependencies
 ]
 ```
 
-The fixed catalog is application data packaged in `src/product_service/products.json`, so every instance of a release serves the same response. There are no migrations, seeding commands, credentials, or writable catalog files to configure.
+The `/products` handler returns the three fixed product dictionaries directly from Python code, matching the original service. Each request creates the response array; there is no database, catalog file, cache, or persistence.
 
 ## Configuration
 

@@ -30,7 +30,7 @@ Reference: [Config](https://12factor.net/config).
 
 The original API has a fixed, read-only catalog. This implementation consumes no database, queue, cache, or external network service. The methodology does not require introducing a backing service where the application does not need one.
 
-`products.json` is immutable application data shipped with the release, not a per-deployment resource or mutable datastore. All instances of the same release serve the same catalog.
+The `/products` handler creates the same three fixed product dictionaries for each request, matching the original service. Product data is defined in code and is not read from a file, cached, or persisted. All instances of the same release return the same catalog.
 
 If an external catalog or another backing service is introduced later, its locator and credentials must be injected through environment variables, and local/hosted instances must be interchangeable without source changes. No backing-service locator or credential is hardcoded in the current service.
 
@@ -41,10 +41,10 @@ Reference: [Backing services](https://12factor.net/backing-services).
 | Factor | Implementation and deployment practice |
 | --- | --- |
 | 5. Build, release, run | `uv build` produces a wheel; Docker builds from the locked codebase. Supply deployment configuration when releasing/running. Deploy immutable image tags/digests and do not edit running containers. |
-| 6. Processes | Workers have no mutable catalog/session state and write no persistent data. Each instance loads the same bundled catalog. |
+| 6. Processes | Workers have no mutable catalog/session state and write no persistent data. Each request creates a fresh response from the same fixed values. |
 | 7. Port binding | Uvicorn binds `HOST` and `PORT` directly; defaults are `0.0.0.0:3030`. |
 | 8. Concurrency | `WORKERS` controls worker processes. A platform can run multiple independent instances behind a load balancer. |
-| 9. Disposability | Startup validates settings and loads the small catalog. Uvicorn handles process signals and allows 15 seconds for graceful request shutdown. |
+| 9. Disposability | Startup validates settings. Uvicorn handles process signals and allows 15 seconds for graceful request shutdown. |
 | 10. Dev/prod parity | Use the same Python runtime family, lockfile, package, and catalog across deployments. No separate database products or provisioning steps are involved. |
 | 11. Logs | HTTP and error logs go to standard streams for platform collection; the service writes no log files. |
 | 12. Admin processes | The fixed read-only API needs no database administration jobs. Any future one-off maintenance job should use the same released package and environment as the running service. |

@@ -1,7 +1,4 @@
-"""Read-only HTTP catalog retaining the original GET /products response."""
-
-import json
-from importlib.resources import files
+"""HTTP API retaining the original fixed, in-code product data."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,11 +15,6 @@ class ProductResponse(BaseModel):
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
-    # The original fixed catalog is application data bundled with each release.
-    catalog = [
-        ProductResponse.model_validate(item)
-        for item in json.loads(files("product_service").joinpath("products.json").read_text())
-    ]
     app = FastAPI(title="Product Service Python", version="0.1.0")
     app.add_middleware(
         CORSMiddleware,
@@ -32,8 +24,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     @app.get("/products", response_model=list[ProductResponse])
-    def products() -> list[ProductResponse]:
-        return catalog
+    def products() -> list[dict[str, object]]:
+        return [
+            {"id": 1, "name": "Dog Food", "price": 19.99},
+            {"id": 2, "name": "Cat Food", "price": 34.99},
+            {"id": 3, "name": "Bird Seeds", "price": 10.99},
+        ]
 
     @app.get("/health/live")
     def live() -> dict[str, str]:
