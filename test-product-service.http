@@ -1,0 +1,11 @@
+@baseUrl = http://localhost:3030
+
+### Original API: the three seeded products
+GET {{baseUrl}}/products
+Accept: application/json
+
+### Process health (independent of the database)
+GET {{baseUrl}}/health/live
+
+### Backing resource health and schema
+GET {{baseUrl}}/health/ready
