@@ -1,36 +1,15 @@
 services:
-  db:
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-product}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-      POSTGRES_DB: ${POSTGRES_DB:-products}
-    ports:
-      - "127.0.0.1:${DB_PORT:-5432}:5432"
-    volumes:
-      - product-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 5s
-      timeout: 3s
-      retries: 12
-
   api:
     build: .
     image: product-service-python:local
     environment:
-      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env}
       HOST: ${HOST:-0.0.0.0}
       PORT: ${PORT:-3030}
       WORKERS: ${WORKERS:-1}
       LOG_LEVEL: ${LOG_LEVEL:-info}
-      CORS_ORIGINS: ${CORS_ORIGINS:-*}
-      DB_CONNECT_TIMEOUT: ${DB_CONNECT_TIMEOUT:-5}
+      CORS_ORIGINS: ${CORS_ORIGINS-*}
     ports:
       - "${PORT:-3030}:${PORT:-3030}"
-    depends_on:
-      db:
-        condition: service_healthy
     healthcheck:
       test:
         - CMD
@@ -41,6 +20,3 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
-
-volumes:
-  product-data:

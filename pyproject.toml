@@ -12,14 +12,11 @@ dependencies = [
     "fastapi>=0.115,<1",
     "pydantic>=2.7,<3",
     "uvicorn>=0.30,<1",
-    "SQLAlchemy>=2.0,<2.1",
-    "psycopg[binary]>=3.2,<4",
     "python-dotenv>=1.0,<2",
 ]
 
 [project.scripts]
 product-service = "product_service.__main__:main"
-product-service-admin = "product_service.manage:main"
 
 [dependency-groups]
 dev = ["pytest>=8,<10", "httpx>=0.27,<1", "ruff>=0.8,<1"]
@@ -28,7 +25,7 @@ dev = ["pytest>=8,<10", "httpx>=0.27,<1", "ruff>=0.8,<1"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-product_service = ["sample_products.json"]
+product_service = ["products.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
