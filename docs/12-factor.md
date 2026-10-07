@@ -1,12 +1,12 @@
-# 12-factor implementation
+# 12-Factor App: first four factors
 
-This service follows the [12-Factor App methodology](https://12factor.net/) while preserving the original fixed product catalog. Deployment infrastructure supplies routing, TLS, log collection, and release orchestration.
+This project's scope is the first four factors of the [12-Factor App methodology](https://12factor.net/): Codebase, Dependencies, Config, and Backing services. The Python API preserves the original fixed product data and response.
 
 ## 1. Codebase
 
-`product-service-python` has one independent Git repository. The same package and source revision supply local development, staging, and production. Deployment settings do not require source copies or environment-specific branches.
+`product-service-python` has one independent Git repository under `C:\AC Labs\8915 labs\lab3\product-service-python`. Development, staging, and production use revisions from this same codebase. Deployment settings do not require source copies or environment-specific branches.
 
-Evidence: `pyproject.toml`, `src/product_service/`, and this project's Git history.
+Evidence: this project's Git history, `pyproject.toml`, and `src/product_service/`.
 
 Reference: [Codebase](https://12factor.net/codebase).
 
@@ -14,41 +14,22 @@ Reference: [Codebase](https://12factor.net/codebase).
 
 All imported third-party libraries are declared in `pyproject.toml`. `uv.lock` records exact resolved versions and distribution hashes, including transitive dependencies. The build backend and dependency-manager version are pinned.
 
-`uv sync --locked` installs into an isolated `.venv` and refuses an outdated lock. Docker installs the same locked runtime dependencies with `--no-dev --no-editable`. Python 3.13/3.14 is the declared runtime prerequisite. Request processing does not invoke undeclared shell tools.
+`uv sync --locked` installs into an isolated `.venv` and refuses an outdated lock. The optional Docker setup installs the same locked runtime dependencies with `--no-dev --no-editable`. Python 3.13/3.14 is the declared runtime prerequisite. Request processing does not invoke undeclared shell utilities.
 
 Reference: [Dependencies](https://12factor.net/dependencies).
 
 ## 3. Config
 
-`Settings.from_env()` reads `HOST`, `PORT`, `WORKERS`, `LOG_LEVEL`, and `CORS_ORIGINS` independently from environment variables. Invalid values fail startup clearly. Deployment configuration is separated from route definitions and the fixed application catalog.
+`Settings.from_env()` reads deployment settings independently from environment variables: `HOST`, `PORT`, `WORKERS`, `LOG_LEVEL`, and `CORS_ORIGINS`. Invalid values fail startup clearly. These settings are separate from route definitions and the fixed product data.
 
-The optional current-directory `.env` is for local convenience. Injected variables take precedence, parent directories are never searched, and real `.env` files are excluded from version control and Docker builds.
+The optional current-directory `.env` is a local convenience. Injected environment variables take precedence. Parent directories are never searched. Real `.env` files are excluded from version control and Docker builds; `.env.example` documents available settings.
 
 Reference: [Config](https://12factor.net/config).
 
 ## 4. Backing services
 
-The original API has a fixed, read-only catalog. This implementation consumes no database, queue, cache, or external network service. The methodology does not require introducing a backing service where the application does not need one.
+The original API returns three fixed products directly from code. The Python `/products` handler uses the same data handling: each request creates the same three product dictionaries. There is no database, catalog file, cache, or persistent storage.
 
-The `/products` handler creates the same three fixed product dictionaries for each request, matching the original service. Product data is defined in code and is not read from a file, cached, or persisted. All instances of the same release return the same catalog.
-
-If an external catalog or another backing service is introduced later, its locator and credentials must be injected through environment variables, and local/hosted instances must be interchangeable without source changes. No backing-service locator or credential is hardcoded in the current service.
+The application currently consumes no backing services. This factor does not require adding a database or another service. If a backing service is needed later, its locator and credentials must come from environment variables, and local or hosted resources must be replaceable without changing application code.
 
 Reference: [Backing services](https://12factor.net/backing-services).
-
-## Remaining factors
-
-| Factor | Implementation and deployment practice |
-| --- | --- |
-| 5. Build, release, run | `uv build` produces a wheel; Docker builds from the locked codebase. Supply deployment configuration when releasing/running. Deploy immutable image tags/digests and do not edit running containers. |
-| 6. Processes | Workers have no mutable catalog/session state and write no persistent data. Each request creates a fresh response from the same fixed values. |
-| 7. Port binding | Uvicorn binds `HOST` and `PORT` directly; defaults are `0.0.0.0:3030`. |
-| 8. Concurrency | `WORKERS` controls worker processes. A platform can run multiple independent instances behind a load balancer. |
-| 9. Disposability | Startup validates settings. Uvicorn handles process signals and allows 15 seconds for graceful request shutdown. |
-| 10. Dev/prod parity | Use the same Python runtime family, lockfile, package, and catalog across deployments. No separate database products or provisioning steps are involved. |
-| 11. Logs | HTTP and error logs go to standard streams for platform collection; the service writes no log files. |
-| 12. Admin processes | The fixed read-only API needs no database administration jobs. Any future one-off maintenance job should use the same released package and environment as the running service. |
-
-## Verification
-
-Tests cover the exact original product response, startup without a database or resource configuration, identical catalogs across instances, health endpoints, GET-only behavior, CORS controls, environment precedence, and configuration validation. CI uses the locked dependencies and builds the package after checks.

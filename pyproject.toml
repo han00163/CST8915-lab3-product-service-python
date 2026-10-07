@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "product-service-python"
 version = "0.1.0"
-description = "A twelve-factor Python product catalog service"
+description = "A Python product service applying the first four 12-Factor principles"
 readme = "README.md"
 requires-python = ">=3.13,<3.15"
 dependencies = [

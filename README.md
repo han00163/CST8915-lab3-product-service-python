@@ -1,6 +1,6 @@
 # product-service-python
 
-A Python implementation of the original read-only product service. It returns the same three products from `GET /products`, uses numeric prices, permits GET CORS by default, and listens on port 3030. It runs without a database or separate backing-service process.
+A Python implementation of the original read-only product service. It returns the same three products from `GET /products`, uses numeric prices, permits GET CORS by default, and listens on port 3030. It runs without a database or separate backing-service process. The methodology scope is the first four factors: Codebase, Dependencies, Config, and Backing services.
 
 ## Run on Windows
 
@@ -76,4 +76,4 @@ uv build
 
 `uv.lock` records exact dependency versions and distribution hashes. `uv sync --locked` installs into an isolated `.venv` and refuses stale locks. For intentional upgrades, run `uv lock --upgrade`, verify the service, and commit the manifest and lock together.
 
-See [the 12-factor implementation](docs/12-factor.md), including the explanation of Backing services for this service's database-free design.
+See [the first four 12-Factor principles](docs/12-factor.md) for Codebase, Dependencies, Config, and Backing services.
