@@ -33,6 +33,10 @@ docker compose up --build
 
 Compose starts only the API. The image uses the same locked runtime dependencies and runs as an unprivileged user.
 
+## Azure App Service
+
+For Azure's Linux Python Code deployment, use Startup Command `sh startup.sh` and keep `SCM_DO_BUILD_DURING_DEPLOYMENT=1`. The committed `requirements.txt` is generated from `uv.lock` for Azure's default GitHub workflow. See [Azure setup and troubleshooting](docs/azure-app-service.md).
+
 ## API
 
 | Route | Response |
